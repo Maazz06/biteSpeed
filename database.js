@@ -1,18 +1,22 @@
-const mysql = require('mysql2/promise');
+const { Sequelize } = require('sequelize');
 require('dotenv').config({ path: './.env' });
 
-let connection;
+const sequelize = new Sequelize(process.env.DB_URL, {
+  dialect: 'mysql',
+  logging: false,
+});
 
 async function connectDatabase() {
   try {
-    connection = await mysql.createConnection(process.env.DB_URL);
-    console.log('Successfully connected to MySQL via URL!');
+    await sequelize.authenticate();
+    console.log('Sequelize connected to MySQL!');
   } catch (err) {
-    console.log('Connection Error:', err.message);
+    console.error('Sequelize connection error:', err.message);
+    process.exit(1);
   }
 }
 
 module.exports = {
+  sequelize,
   connectDatabase,
-  getConnection: () => connection
 };
